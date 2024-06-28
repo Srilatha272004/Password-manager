@@ -31,7 +31,22 @@ def hash_password(password):
 def verify_password(hashed, password):
     return bcrypt.checkpw(password.encode(), hashed)
 
-# Store password
+# Store master password and username
+def store_master_password(username, password):
+    hashed_password = hash_password(password)
+    master_data = {
+        "username": username,
+        "password": hashed_password.decode()
+    }
+    with open("master_password.json", "w") as file:
+        json.dump(master_data, file, indent=4)
+
+# Load master password and username
+def load_master_password():
+    with open("master_password.json", "r") as file:
+        return json.load(file)
+
+# Store service password
 def store_password(service, username, password, key):
     encrypted_username = encrypt_data(username, key)
     encrypted_password = encrypt_data(password, key)
@@ -50,7 +65,7 @@ def store_password(service, username, password, key):
     with open("passwords.json", "w") as file:
         json.dump(passwords, file, indent=4)
 
-# Retrieve password
+# Retrieve service password
 def retrieve_password(service, key):
     with open("passwords.json", "r") as file:
         passwords = json.load(file)
@@ -73,14 +88,19 @@ def main():
     
     key = load_key()
 
-    # Hash and verify master password
-    master_password = input("Set master password: ")
-    hashed_master_password = hash_password(master_password)
-
-    verify = input("Verify master password: ")
-    if not verify_password(hashed_master_password, verify):
-        print("Password does not match!")
-        return
+    if not os.path.exists("master_password.json"):
+        username = input("Set master username: ")
+        master_password = input("Set master password: ")
+        store_master_password(username, master_password)
+    else:
+        master_data = load_master_password()
+        username = master_data["username"]
+        hashed_master_password = master_data["password"].encode()
+        master_password = input(f"Enter master password for user {username}: ")
+        
+        if not verify_password(hashed_master_password, master_password):
+            print("Password does not match!")
+            return
     
     # Example usage
     service = input("Enter service name: ")
