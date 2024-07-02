@@ -104,16 +104,23 @@ def main():
     
     # Example usage
     service = input("Enter service name: ")
-    username = input("Enter username: ")
-    password = input("Enter password: ")
-    
-    store_password(service, username, password, key)
-    
-    retrieved = retrieve_password(service, key)
-    if retrieved:
-        print(f"Retrieved - Username: {retrieved[0]}, Password: {retrieved[1]}")
+
+    # Load passwords.json if it exists
+    if os.path.exists("passwords.json"):
+        with open("passwords.json", "r") as file:
+            passwords = json.load(file)
     else:
-        print("Service not found!")
+        passwords = {}
+
+    if service in passwords:
+        retrieved = retrieve_password(service, key)
+        if retrieved:
+            print(f"Retrieved - Username: {retrieved[0]}, Password: {retrieved[1]}")
+    else:
+        username = input("Enter username: ")
+        password = input("Enter password: ")
+        store_password(service, username, password, key)
+        print("Credentials stored successfully.")
 
 if __name__ == "__main__":
     main()
