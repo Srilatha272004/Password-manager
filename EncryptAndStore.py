@@ -117,10 +117,14 @@ def main():
         if retrieved:
             print(f"Retrieved - Username: {retrieved[0]}, Password: {retrieved[1]}")
     else:
-        username = input("Enter username: ")
-        password = input("Enter password: ")
-        store_password(service, username, password, key)
-        print("Credentials stored successfully.")
-
+        choice = input("This service does not exist. Do you want to create a new one? (Y/N): ").strip().lower()
+        if choice != "y":
+            print("Thank you")
+        else:
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            store_password(service, username, password, key)
+            print("Credentials stored successfully.")
+        
 if __name__ == "__main__":
     main()
